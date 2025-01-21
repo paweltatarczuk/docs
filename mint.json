@@ -27,8 +27,8 @@
   },
   "tabs": [
     {
-      "name": "API Reference",
-      "url": "api-reference"
+      "name": "Admin API",
+      "url": "api-reference/admin"
     }
   ],
   "anchors": [
@@ -69,23 +69,43 @@
       ]
     },
     {
-      "group": "API Documentation",
+      "group": "Admin API",
       "pages": [
-        "api-reference/introduction"
+        "api-reference/admin/introduction"
       ]
     },
     {
-      "group": "Endpoint Examples",
+      "group": "Core Resources",
       "pages": [
-        "api-reference/endpoint/get",
-        "api-reference/endpoint/create",
-        "api-reference/endpoint/delete"
+        "api-reference/admin/resources/customer",
+        {
+          "group": "Subscriptions",
+          "pages": [
+            "api-reference/admin/subscriptions/resource",
+            "api-reference/admin/subscriptions/list",
+            "api-reference/admin/subscriptions/update",
+            "api-reference/admin/subscriptions/cancel"
+          ]
+        },
+        {
+          "group": "Subscription items",
+          "pages": [
+            "api-reference/admin/subscription-items/resource",
+            "api-reference/admin/subscription-items/create",
+            "api-reference/admin/subscription-items/update",
+            "api-reference/admin/subscription-items/delete"
+          ]
+        },
+        {
+          "group": "Subscription discounts",
+          "pages": [
+            "api-reference/admin/subscription-discounts/resource",
+            "api-reference/admin/subscription-discounts/create",
+            "api-reference/admin/subscription-discounts/update",
+            "api-reference/admin/subscription-discounts/delete"
+          ]
+        }
       ]
     }
-  ],
-  "footerSocials": {
-    "x": "https://x.com/mintlify",
-    "github": "https://github.com/mintlify",
-    "linkedin": "https://linkedin.com/company/mintlify"
-  }
+  ]
 }

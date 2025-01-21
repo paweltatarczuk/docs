@@ -1,0 +1,49 @@
+---
+title: "Introduction"
+description: "Example section for showcasing API endpoints"
+---
+
+## Welcome
+
+The Juo Admin API provides programmatic access to manage subscription resources. This RESTful API allows administrators to interact with subscriptions, customers, and other Juo entities.
+
+## Authentication
+
+All API requests must include an API token in the `X-Juo-Admin-Api-Token` header. Tokens can be generated in the Juo admin interface. Keep your API tokens secure and never share them.
+
+```
+X-Juo-Admin-Api-Token: your_api_token
+```
+
+## Pagination
+
+The API uses cursor-based pagination to handle large result sets. Navigation links are provided in the `Link` response header, containing URLs for the next and previous pages.
+
+```
+Link: <https://api.juo.io/v1/subscriptions?cursor=next_cursor>; rel="next",
+      <https://api.juo.io/v1/subscriptions?cursor=prev_cursor>; rel="prev"
+```
+
+## Sorting and Filtering
+
+Results can be sorted using the `sort` query parameter. Multiple sort criteria can be combined using commas. Use the `query` parameter to filter results based on specific criteria.
+
+```
+# Sort by creation date descending
+/admin/v1/subscriptions?sort=createdAt:desc
+
+# Filter active subscriptions
+/admin/v1/subscriptions?query=status:active
+```
+
+## Rate Limiting
+
+The API implements a token bucket rate-limiting strategy to ensure fair usage. Each API token has a bucket that fills at a constant rate. API calls consume tokens from the bucket. When the bucket is empty, requests will be rejected until it refills.
+
+Rate limit information is included in the response headers:
+
+```
+X-RateLimit-Limit: 1000
+X-RateLimit-Remaining: 999
+X-RateLimit-Reset: 1516239022
+```

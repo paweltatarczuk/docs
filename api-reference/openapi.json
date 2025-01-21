@@ -1,195 +1,1772 @@
 {
-  "openapi": "3.0.1",
-  "info": {
-    "title": "OpenAPI Plant Store",
-    "description": "A sample API that uses a plant store as an example to demonstrate features in the OpenAPI specification",
-    "license": {
-      "name": "MIT"
+    "openapi": "3.1.0",
+    "info": {
+        "version": "8.12.0",
+        "title": "@fastify/swagger"
     },
-    "version": "1.0.0"
-  },
-  "servers": [
-    {
-      "url": "http://sandbox.mintlify.com"
-    }
-  ],
-  "security": [
-    {
-      "bearerAuth": []
-    }
-  ],
-  "paths": {
-    "/plants": {
-      "get": {
-        "description": "Returns all plants from the system that the user has access to",
-        "parameters": [
-          {
-            "name": "limit",
-            "in": "query",
-            "description": "The maximum number of results to return",
-            "schema": {
-              "type": "integer",
-              "format": "int32"
+    "components": {
+        "schemas": {
+            "Customer": {
+                "type": "object",
+                "properties": {
+                    "id": {
+                        "type": "number"
+                    },
+                    "resource": {
+                        "type": "string",
+                        "enum": [
+                            "Customer"
+                        ]
+                    },
+                    "displayName": {
+                        "minLength": 1,
+                        "description": "Customer's full name",
+                        "type": "string"
+                    },
+                    "email": {
+                        "minLength": 1,
+                        "description": "Customer's contact email",
+                        "type": [
+                            "null",
+                            "string"
+                        ]
+                    },
+                    "phone": {
+                        "minLength": 1,
+                        "description": "Customer's contact phone",
+                        "type": [
+                            "null",
+                            "string"
+                        ]
+                    }
+                },
+                "required": [
+                    "id",
+                    "resource",
+                    "displayName",
+                    "email",
+                    "phone"
+                ],
+                "title": "Customer"
+            },
+            "CustomerPaymentMethod": {
+                "type": "object",
+                "properties": {
+                    "id": {
+                        "format": "uuid",
+                        "type": "string"
+                    },
+                    "customer": {
+                        "description": "This field is expandable.",
+                        "anyOf": [
+                            {
+                                "type": "number"
+                            },
+                            {
+                                "$ref": "#/components/schemas/Customer"
+                            }
+                        ]
+                    },
+                    "instrument": {
+                        "anyOf": [
+                            {
+                                "type": "object",
+                                "properties": {
+                                    "type": {
+                                        "type": "string",
+                                        "enum": [
+                                            "CreditCard"
+                                        ]
+                                    },
+                                    "brand": {
+                                        "minLength": 1,
+                                        "description": "Credit card network name",
+                                        "type": "string"
+                                    },
+                                    "maskedNumber": {
+                                        "minLength": 1,
+                                        "description": "Masked card number",
+                                        "type": "string"
+                                    }
+                                },
+                                "required": [
+                                    "type",
+                                    "brand",
+                                    "maskedNumber"
+                                ]
+                            },
+                            {
+                                "type": "object",
+                                "properties": {
+                                    "type": {
+                                        "type": "string",
+                                        "enum": [
+                                            "PayPal"
+                                        ]
+                                    },
+                                    "paypalAccountEmail": {
+                                        "minLength": 1,
+                                        "description": "Email of the associated PayPal account",
+                                        "type": [
+                                            "null",
+                                            "string"
+                                        ]
+                                    }
+                                },
+                                "required": [
+                                    "type",
+                                    "paypalAccountEmail"
+                                ]
+                            },
+                            {
+                                "type": "object",
+                                "properties": {
+                                    "type": {
+                                        "type": "string",
+                                        "enum": [
+                                            "ShopPay"
+                                        ]
+                                    },
+                                    "maskedNumber": {
+                                        "minLength": 1,
+                                        "description": "Masked card number",
+                                        "type": "string"
+                                    }
+                                },
+                                "required": [
+                                    "type",
+                                    "maskedNumber"
+                                ]
+                            },
+                            {
+                                "type": "object",
+                                "properties": {
+                                    "type": {
+                                        "type": "string",
+                                        "enum": [
+                                            "SepaDirectDebit"
+                                        ]
+                                    },
+                                    "consumerName": {
+                                        "minLength": 1,
+                                        "description": "Full name of the account holder",
+                                        "type": "string"
+                                    },
+                                    "consumerBic": {
+                                        "minLength": 1,
+                                        "description": "BIC code",
+                                        "type": "string"
+                                    },
+                                    "maskedConsumerAccount": {
+                                        "minLength": 1,
+                                        "description": "Masked IBAN",
+                                        "type": "string"
+                                    }
+                                },
+                                "required": [
+                                    "type",
+                                    "consumerName",
+                                    "consumerBic",
+                                    "maskedConsumerAccount"
+                                ]
+                            },
+                            {
+                                "type": "object",
+                                "properties": {
+                                    "type": {
+                                        "type": "string",
+                                        "enum": [
+                                            "BLIK"
+                                        ]
+                                    }
+                                },
+                                "required": [
+                                    "type"
+                                ]
+                            },
+                            {
+                                "type": "object",
+                                "properties": {
+                                    "type": {
+                                        "type": "string",
+                                        "enum": [
+                                            "MBWay"
+                                        ]
+                                    },
+                                    "phone": {
+                                        "minLength": 1,
+                                        "type": "string"
+                                    }
+                                },
+                                "required": [
+                                    "type"
+                                ]
+                            }
+                        ]
+                    }
+                },
+                "required": [
+                    "id",
+                    "customer"
+                ],
+                "title": "CustomerPaymentMethod"
+            },
+            "Subscription": {
+                "type": "object",
+                "properties": {
+                    "id": {
+                        "format": "uuid",
+                        "type": "string"
+                    },
+                    "resource": {
+                        "type": "string",
+                        "enum": [
+                            "Subscription"
+                        ]
+                    },
+                    "ref": {
+                        "minLength": 1,
+                        "type": "string"
+                    },
+                    "status": {
+                        "type": "string",
+                        "enum": [
+                            "active",
+                            "paused",
+                            "canceled",
+                            "failed",
+                            "expired"
+                        ]
+                    },
+                    "createdAt": {
+                        "format": "date-time",
+                        "type": "string"
+                    },
+                    "updatedAt": {
+                        "format": "date-time",
+                        "type": "string"
+                    },
+                    "cancelledAt": {
+                        "format": "date-time",
+                        "type": [
+                            "null",
+                            "string"
+                        ]
+                    },
+                    "customer": {
+                        "description": "This field is expandable.",
+                        "anyOf": [
+                            {
+                                "type": "number"
+                            },
+                            {
+                                "$ref": "#/components/schemas/Customer"
+                            }
+                        ]
+                    },
+                    "nextBillingDate": {
+                        "format": "date-time",
+                        "type": [
+                            "null",
+                            "string"
+                        ]
+                    },
+                    "currentCycle": {
+                        "minimum": 0,
+                        "type": "integer"
+                    },
+                    "items": {
+                        "minItems": 1,
+                        "type": "array",
+                        "items": {
+                            "$ref": "#/components/schemas/SubscriptionItem"
+                        }
+                    },
+                    "discounts": {
+                        "type": "array",
+                        "items": {
+                            "$ref": "#/components/schemas/SubscriptionDiscount"
+                        }
+                    },
+                    "paymentMethod": {
+                        "description": "This field is expandable.",
+                        "anyOf": [
+                            {
+                                "format": "uuid",
+                                "type": "string"
+                            },
+                            {
+                                "$ref": "#/components/schemas/CustomerPaymentMethod"
+                            },
+                            {
+                                "type": "null"
+                            }
+                        ]
+                    },
+                    "currencyCode": {
+                        "minLength": 3,
+                        "maxLength": 3,
+                        "type": "string"
+                    },
+                    "deliveryAddress": {
+                        "oneOf": [
+                            {
+                                "type": "null"
+                            },
+                            {
+                                "type": "object",
+                                "properties": {
+                                    "firstName": {
+                                        "minLength": 1,
+                                        "description": "Customer's first name",
+                                        "type": [
+                                            "null",
+                                            "string"
+                                        ]
+                                    },
+                                    "lastName": {
+                                        "minLength": 1,
+                                        "description": "Customer's last name",
+                                        "type": [
+                                            "null",
+                                            "string"
+                                        ]
+                                    },
+                                    "address1": {
+                                        "minLength": 1,
+                                        "description": "Primary street address",
+                                        "type": [
+                                            "null",
+                                            "string"
+                                        ]
+                                    },
+                                    "address2": {
+                                        "minLength": 1,
+                                        "description": "Additional address information (apartment, suite, etc.)",
+                                        "type": [
+                                            "null",
+                                            "string"
+                                        ]
+                                    },
+                                    "zip": {
+                                        "minLength": 1,
+                                        "description": "Postal/ZIP code",
+                                        "type": [
+                                            "null",
+                                            "string"
+                                        ]
+                                    },
+                                    "city": {
+                                        "minLength": 1,
+                                        "description": "City name",
+                                        "type": [
+                                            "null",
+                                            "string"
+                                        ]
+                                    },
+                                    "country": {
+                                        "minLength": 1,
+                                        "description": "Full country name",
+                                        "type": "string"
+                                    },
+                                    "countryCode": {
+                                        "minLength": 2,
+                                        "maxLength": 2,
+                                        "description": "Two-letter country code (ISO 3166-1)",
+                                        "type": "string"
+                                    },
+                                    "provinceCode": {
+                                        "minLength": 2,
+                                        "description": "Province/state code",
+                                        "type": [
+                                            "null",
+                                            "string"
+                                        ]
+                                    },
+                                    "province": {
+                                        "minLength": 1,
+                                        "description": "Full province/state name",
+                                        "type": [
+                                            "null",
+                                            "string"
+                                        ]
+                                    },
+                                    "phone": {
+                                        "minLength": 1,
+                                        "description": "Contact phone number",
+                                        "type": [
+                                            "null",
+                                            "string"
+                                        ]
+                                    },
+                                    "company": {
+                                        "minLength": 1,
+                                        "description": "Company name",
+                                        "type": [
+                                            "null",
+                                            "string"
+                                        ]
+                                    }
+                                },
+                                "required": [
+                                    "firstName",
+                                    "lastName",
+                                    "address1",
+                                    "address2",
+                                    "zip",
+                                    "city",
+                                    "country",
+                                    "countryCode",
+                                    "provinceCode",
+                                    "province",
+                                    "phone",
+                                    "company"
+                                ]
+                            }
+                        ]
+                    },
+                    "deliveryMethod": {
+                        "type": "object",
+                        "properties": {
+                            "type": {
+                                "type": "string",
+                                "enum": [
+                                    "Shipping",
+                                    "LocalDelivery",
+                                    "Pickup"
+                                ]
+                            },
+                            "title": {
+                                "type": "string"
+                            },
+                            "presentmentTitle": {
+                                "type": [
+                                    "null",
+                                    "string"
+                                ]
+                            },
+                            "description": {
+                                "type": [
+                                    "null",
+                                    "string"
+                                ]
+                            }
+                        },
+                        "required": [
+                            "type",
+                            "title",
+                            "presentmentTitle",
+                            "description"
+                        ]
+                    },
+                    "deliveryPrice": {
+                        "minimum": 0,
+                        "type": "number"
+                    }
+                },
+                "required": [
+                    "id",
+                    "resource",
+                    "ref",
+                    "status",
+                    "createdAt",
+                    "updatedAt",
+                    "cancelledAt",
+                    "customer",
+                    "nextBillingDate",
+                    "currentCycle",
+                    "items",
+                    "discounts",
+                    "paymentMethod",
+                    "currencyCode",
+                    "deliveryAddress",
+                    "deliveryMethod",
+                    "deliveryPrice"
+                ],
+                "title": "Subscription"
+            },
+            "SubscriptionItem": {
+                "type": "object",
+                "properties": {
+                    "id": {
+                        "format": "uuid",
+                        "type": "string"
+                    },
+                    "resource": {
+                        "type": "string",
+                        "enum": [
+                            "SubscriptionItem"
+                        ]
+                    },
+                    "title": {
+                        "minLength": 1,
+                        "type": "string"
+                    },
+                    "subtitle": {
+                        "minLength": 1,
+                        "description": "Usually a variant title",
+                        "type": [
+                            "null",
+                            "string"
+                        ]
+                    },
+                    "quantity": {
+                        "minimum": 1,
+                        "type": "integer"
+                    },
+                    "totalPrice": {
+                        "minimum": 0,
+                        "description": "Total item price after all discounts and tax adjustments",
+                        "type": "number"
+                    },
+                    "variant": {
+                        "description": "This field is expandable.",
+                        "anyOf": [
+                            {
+                                "minLength": 1,
+                                "type": "string"
+                            },
+                            {
+                                "$ref": "#/components/schemas/ProductVariant"
+                            },
+                            {
+                                "type": "null"
+                            }
+                        ]
+                    }
+                },
+                "required": [
+                    "id",
+                    "resource",
+                    "title",
+                    "subtitle",
+                    "quantity",
+                    "totalPrice",
+                    "variant"
+                ],
+                "title": "SubscriptionItem"
+            },
+            "SubscriptionDiscount": {
+                "type": "object",
+                "properties": {
+                    "id": {
+                        "format": "uuid",
+                        "type": "string"
+                    },
+                    "resource": {
+                        "type": "string",
+                        "enum": [
+                            "SubscriptionDiscount"
+                        ]
+                    },
+                    "title": {
+                        "minLength": 1,
+                        "type": "string"
+                    },
+                    "target": {
+                        "anyOf": [
+                            {
+                                "type": "object",
+                                "properties": {
+                                    "type": {
+                                        "type": "string",
+                                        "enum": [
+                                            "Shipping"
+                                        ]
+                                    }
+                                },
+                                "required": [
+                                    "type"
+                                ]
+                            },
+                            {
+                                "type": "object",
+                                "properties": {
+                                    "type": {
+                                        "type": "string",
+                                        "enum": [
+                                            "Line"
+                                        ]
+                                    },
+                                    "selector": {
+                                        "anyOf": [
+                                            {
+                                                "type": "object",
+                                                "properties": {
+                                                    "type": {
+                                                        "type": "string",
+                                                        "enum": [
+                                                            "all"
+                                                        ]
+                                                    }
+                                                },
+                                                "required": [
+                                                    "type"
+                                                ]
+                                            },
+                                            {
+                                                "type": "object",
+                                                "properties": {
+                                                    "type": {
+                                                        "type": "string",
+                                                        "enum": [
+                                                            "some"
+                                                        ]
+                                                    },
+                                                    "lines": {
+                                                        "type": "array",
+                                                        "items": {
+                                                            "format": "uuid",
+                                                            "type": "string"
+                                                        }
+                                                    }
+                                                },
+                                                "required": [
+                                                    "type",
+                                                    "lines"
+                                                ]
+                                            }
+                                        ]
+                                    }
+                                },
+                                "required": [
+                                    "type",
+                                    "selector"
+                                ]
+                            }
+                        ]
+                    },
+                    "value": {
+                        "anyOf": [
+                            {
+                                "type": "object",
+                                "properties": {
+                                    "amount": {
+                                        "exclusiveMinimum": 0,
+                                        "type": "number"
+                                    },
+                                    "type": {
+                                        "type": "string",
+                                        "enum": [
+                                            "FixedAmount"
+                                        ]
+                                    },
+                                    "appliesOnEachItem": {
+                                        "type": "boolean"
+                                    }
+                                },
+                                "required": [
+                                    "amount",
+                                    "type",
+                                    "appliesOnEachItem"
+                                ]
+                            },
+                            {
+                                "type": "object",
+                                "properties": {
+                                    "percentage": {
+                                        "exclusiveMinimum": 0,
+                                        "maximum": 100,
+                                        "type": "number"
+                                    },
+                                    "type": {
+                                        "type": "string",
+                                        "enum": [
+                                            "Percentage"
+                                        ]
+                                    }
+                                },
+                                "required": [
+                                    "percentage",
+                                    "type"
+                                ]
+                            }
+                        ]
+                    }
+                },
+                "required": [
+                    "id",
+                    "resource",
+                    "title",
+                    "target",
+                    "value"
+                ],
+                "title": "SubscriptionDiscount"
+            },
+            "Product": {
+                "type": "object",
+                "properties": {
+                    "id": {
+                        "minLength": 1,
+                        "type": "string"
+                    },
+                    "title": {
+                        "minLength": 1,
+                        "type": "string"
+                    },
+                    "image": {
+                        "oneOf": [
+                            {
+                                "type": "null"
+                            },
+                            {
+                                "type": "object",
+                                "properties": {
+                                    "id": {
+                                        "minLength": 1,
+                                        "type": "string"
+                                    },
+                                    "url": {
+                                        "format": "uri",
+                                        "type": "string"
+                                    },
+                                    "altText": {
+                                        "minLength": 1,
+                                        "type": [
+                                            "null",
+                                            "string"
+                                        ]
+                                    }
+                                },
+                                "required": [
+                                    "id",
+                                    "url",
+                                    "altText"
+                                ]
+                            }
+                        ]
+                    }
+                },
+                "required": [
+                    "id",
+                    "title",
+                    "image"
+                ],
+                "title": "Product"
+            },
+            "ProductVariant": {
+                "type": "object",
+                "properties": {
+                    "id": {
+                        "minLength": 1,
+                        "type": "string"
+                    },
+                    "title": {
+                        "minLength": 1,
+                        "type": "string"
+                    },
+                    "image": {
+                        "oneOf": [
+                            {
+                                "type": "null"
+                            },
+                            {
+                                "type": "object",
+                                "properties": {
+                                    "id": {
+                                        "minLength": 1,
+                                        "type": "string"
+                                    },
+                                    "url": {
+                                        "format": "uri",
+                                        "type": "string"
+                                    },
+                                    "altText": {
+                                        "minLength": 1,
+                                        "type": [
+                                            "null",
+                                            "string"
+                                        ]
+                                    }
+                                },
+                                "required": [
+                                    "id",
+                                    "url",
+                                    "altText"
+                                ]
+                            }
+                        ]
+                    },
+                    "product": {
+                        "description": "This field is expandable.",
+                        "anyOf": [
+                            {
+                                "minLength": 1,
+                                "type": "string"
+                            },
+                            {
+                                "$ref": "#/components/schemas/Product"
+                            }
+                        ]
+                    }
+                },
+                "required": [
+                    "id",
+                    "title",
+                    "image",
+                    "product"
+                ],
+                "title": "ProductVariant"
             }
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "Plant response",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "type": "array",
-                  "items": {
-                    "$ref": "#/components/schemas/Plant"
-                  }
-                }
-              }
-            }
-          },
-          "400": {
-            "description": "Unexpected error",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/Error"
-                }
-              }
-            }
-          }
         }
-      },
-      "post": {
-        "description": "Creates a new plant in the store",
-        "requestBody": {
-          "description": "Plant to add to the store",
-          "content": {
-            "application/json": {
-              "schema": {
-                "$ref": "#/components/schemas/NewPlant"
-              }
+    },
+    "paths": {
+        "/api/admin/v1/subscriptions": {
+            "get": {
+                "description": "Lists subscriptions",
+                "parameters": [
+                    {
+                        "schema": {
+                            "type": "string"
+                        },
+                        "in": "query",
+                        "name": "query",
+                        "required": false,
+                        "description": "The search query string. See [search query language](https://juo.dev/api/admin/search-query-language) for information how to build the search query. Supported fields are: `...`"
+                    },
+                    {
+                        "schema": {
+                            "minimum": 1,
+                            "maximum": 100,
+                            "type": "integer"
+                        },
+                        "in": "query",
+                        "name": "limit",
+                        "required": false,
+                        "description": "See [pagination](/pagination) for more details on how to paginate the response."
+                    },
+                    {
+                        "schema": {
+                            "minLength": 1,
+                            "type": "string"
+                        },
+                        "in": "query",
+                        "name": "cursor",
+                        "required": false,
+                        "description": "See [pagination](/pagination) for more details on how to paginate the response."
+                    },
+                    {
+                        "schema": {
+                            "type": "string"
+                        },
+                        "in": "query",
+                        "name": "sort",
+                        "required": false,
+                        "description": "See [sorting](/sorting) for more details how to sort the response."
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Default Response",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "resource": {
+                                            "type": "string",
+                                            "enum": [
+                                                "List"
+                                            ]
+                                        },
+                                        "data": {
+                                            "type": "array",
+                                            "items": {
+                                                "$ref": "#/components/schemas/Subscription"
+                                            }
+                                        }
+                                    },
+                                    "required": [
+                                        "resource",
+                                        "data"
+                                    ]
+                                }
+                            }
+                        }
+                    }
+                }
             }
-          },
-          "required": true
         },
-        "responses": {
-          "200": {
-            "description": "plant response",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/Plant"
+        "/api/admin/v1/subscriptions/{subscription}": {
+            "patch": {
+                "description": "Updates a subscription",
+                "requestBody": {
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "type": "object",
+                                "properties": {
+                                    "deliveryAddress": {
+                                        "oneOf": [
+                                            {
+                                                "type": "null"
+                                            },
+                                            {
+                                                "type": "object",
+                                                "properties": {
+                                                    "firstName": {
+                                                        "minLength": 1,
+                                                        "description": "Customer's first name",
+                                                        "type": [
+                                                            "null",
+                                                            "string"
+                                                        ]
+                                                    },
+                                                    "lastName": {
+                                                        "minLength": 1,
+                                                        "description": "Customer's last name",
+                                                        "type": [
+                                                            "null",
+                                                            "string"
+                                                        ]
+                                                    },
+                                                    "address1": {
+                                                        "minLength": 1,
+                                                        "description": "Primary street address",
+                                                        "type": [
+                                                            "null",
+                                                            "string"
+                                                        ]
+                                                    },
+                                                    "address2": {
+                                                        "minLength": 1,
+                                                        "description": "Additional address information (apartment, suite, etc.)",
+                                                        "type": [
+                                                            "null",
+                                                            "string"
+                                                        ]
+                                                    },
+                                                    "zip": {
+                                                        "minLength": 1,
+                                                        "description": "Postal/ZIP code",
+                                                        "type": [
+                                                            "null",
+                                                            "string"
+                                                        ]
+                                                    },
+                                                    "city": {
+                                                        "minLength": 1,
+                                                        "description": "City name",
+                                                        "type": [
+                                                            "null",
+                                                            "string"
+                                                        ]
+                                                    },
+                                                    "country": {
+                                                        "minLength": 1,
+                                                        "description": "Full country name",
+                                                        "type": "string"
+                                                    },
+                                                    "countryCode": {
+                                                        "minLength": 2,
+                                                        "maxLength": 2,
+                                                        "description": "Two-letter country code (ISO 3166-1)",
+                                                        "type": "string"
+                                                    },
+                                                    "provinceCode": {
+                                                        "minLength": 2,
+                                                        "description": "Province/state code",
+                                                        "type": [
+                                                            "null",
+                                                            "string"
+                                                        ]
+                                                    },
+                                                    "province": {
+                                                        "minLength": 1,
+                                                        "description": "Full province/state name",
+                                                        "type": [
+                                                            "null",
+                                                            "string"
+                                                        ]
+                                                    },
+                                                    "phone": {
+                                                        "minLength": 1,
+                                                        "description": "Contact phone number",
+                                                        "type": [
+                                                            "null",
+                                                            "string"
+                                                        ]
+                                                    },
+                                                    "company": {
+                                                        "minLength": 1,
+                                                        "description": "Company name",
+                                                        "type": [
+                                                            "null",
+                                                            "string"
+                                                        ]
+                                                    }
+                                                },
+                                                "required": [
+                                                    "firstName",
+                                                    "lastName",
+                                                    "address1",
+                                                    "address2",
+                                                    "zip",
+                                                    "city",
+                                                    "country",
+                                                    "countryCode",
+                                                    "provinceCode",
+                                                    "province",
+                                                    "phone",
+                                                    "company"
+                                                ],
+                                                "additionalProperties": false
+                                            }
+                                        ]
+                                    },
+                                    "deliveryMethod": {
+                                        "type": "object",
+                                        "properties": {
+                                            "type": {
+                                                "type": "string",
+                                                "enum": [
+                                                    "Shipping",
+                                                    "LocalDelivery",
+                                                    "Pickup"
+                                                ]
+                                            },
+                                            "title": {
+                                                "type": "string"
+                                            },
+                                            "presentmentTitle": {
+                                                "type": [
+                                                    "null",
+                                                    "string"
+                                                ]
+                                            },
+                                            "description": {
+                                                "type": [
+                                                    "null",
+                                                    "string"
+                                                ]
+                                            }
+                                        },
+                                        "required": [],
+                                        "additionalProperties": false
+                                    },
+                                    "deliveryPrice": {
+                                        "minimum": 0,
+                                        "type": "number"
+                                    },
+                                    "paymentMethod": {
+                                        "format": "uuid",
+                                        "type": [
+                                            "null",
+                                            "string"
+                                        ]
+                                    }
+                                },
+                                "required": [],
+                                "additionalProperties": false
+                            }
+                        }
+                    }
+                },
+                "parameters": [
+                    {
+                        "schema": {
+                            "format": "uuid",
+                            "type": "string"
+                        },
+                        "in": "path",
+                        "name": "subscription",
+                        "required": true,
+                        "description": "The subscription identifier"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Default Response",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/Subscription"
+                                }
+                            }
+                        }
+                    }
                 }
-              }
             }
-          },
-          "400": {
-            "description": "unexpected error",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/Error"
+        },
+        "/api/admin/v1/subscriptions/{subscription}/pause": {
+            "post": {
+                "description": "Cancels an active subscription",
+                "requestBody": {
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "type": "object",
+                                "properties": {},
+                                "additionalProperties": false
+                            }
+                        }
+                    }
+                },
+                "parameters": [
+                    {
+                        "schema": {
+                            "format": "uuid",
+                            "type": "string"
+                        },
+                        "in": "path",
+                        "name": "subscription",
+                        "required": true,
+                        "description": "The subscription identifier"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Default Response",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/Subscription"
+                                }
+                            }
+                        }
+                    }
                 }
-              }
             }
-          }
+        },
+        "/api/admin/v1/subscriptions/{subscription}/cancel": {
+            "post": {
+                "description": "Cancels an active/paused subscription",
+                "requestBody": {
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "type": "object",
+                                "properties": {
+                                    "cancellationReason": {
+                                        "type": "string"
+                                    },
+                                    "notifyCustomer": {
+                                        "type": "boolean"
+                                    }
+                                },
+                                "additionalProperties": false
+                            }
+                        }
+                    }
+                },
+                "parameters": [
+                    {
+                        "schema": {
+                            "format": "uuid",
+                            "type": "string"
+                        },
+                        "in": "path",
+                        "name": "subscription",
+                        "required": true,
+                        "description": "The subscription identifier"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Default Response",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/Subscription"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/api/admin/v1/subscriptions/{subscription}/discounts": {
+            "post": {
+                "description": "Creates a subscription discount",
+                "requestBody": {
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "type": "object",
+                                "properties": {
+                                    "title": {
+                                        "minLength": 1,
+                                        "type": "string"
+                                    },
+                                    "target": {
+                                        "anyOf": [
+                                            {
+                                                "type": "object",
+                                                "properties": {
+                                                    "type": {
+                                                        "type": "string",
+                                                        "enum": [
+                                                            "Shipping"
+                                                        ]
+                                                    }
+                                                },
+                                                "required": [
+                                                    "type"
+                                                ],
+                                                "additionalProperties": false
+                                            },
+                                            {
+                                                "type": "object",
+                                                "properties": {
+                                                    "type": {
+                                                        "type": "string",
+                                                        "enum": [
+                                                            "Line"
+                                                        ]
+                                                    },
+                                                    "selector": {
+                                                        "anyOf": [
+                                                            {
+                                                                "type": "object",
+                                                                "properties": {
+                                                                    "type": {
+                                                                        "type": "string",
+                                                                        "enum": [
+                                                                            "all"
+                                                                        ]
+                                                                    }
+                                                                },
+                                                                "required": [
+                                                                    "type"
+                                                                ],
+                                                                "additionalProperties": false
+                                                            },
+                                                            {
+                                                                "type": "object",
+                                                                "properties": {
+                                                                    "type": {
+                                                                        "type": "string",
+                                                                        "enum": [
+                                                                            "some"
+                                                                        ]
+                                                                    },
+                                                                    "lines": {
+                                                                        "type": "array",
+                                                                        "items": {
+                                                                            "format": "uuid",
+                                                                            "type": "string"
+                                                                        }
+                                                                    }
+                                                                },
+                                                                "required": [
+                                                                    "type",
+                                                                    "lines"
+                                                                ],
+                                                                "additionalProperties": false
+                                                            }
+                                                        ]
+                                                    }
+                                                },
+                                                "required": [
+                                                    "type",
+                                                    "selector"
+                                                ],
+                                                "additionalProperties": false
+                                            }
+                                        ]
+                                    },
+                                    "value": {
+                                        "anyOf": [
+                                            {
+                                                "type": "object",
+                                                "properties": {
+                                                    "amount": {
+                                                        "exclusiveMinimum": 0,
+                                                        "type": "number"
+                                                    },
+                                                    "type": {
+                                                        "type": "string",
+                                                        "enum": [
+                                                            "FixedAmount"
+                                                        ]
+                                                    },
+                                                    "appliesOnEachItem": {
+                                                        "type": "boolean"
+                                                    }
+                                                },
+                                                "required": [
+                                                    "amount",
+                                                    "type",
+                                                    "appliesOnEachItem"
+                                                ],
+                                                "additionalProperties": false
+                                            },
+                                            {
+                                                "type": "object",
+                                                "properties": {
+                                                    "percentage": {
+                                                        "exclusiveMinimum": 0,
+                                                        "maximum": 100,
+                                                        "type": "number"
+                                                    },
+                                                    "type": {
+                                                        "type": "string",
+                                                        "enum": [
+                                                            "Percentage"
+                                                        ]
+                                                    }
+                                                },
+                                                "required": [
+                                                    "percentage",
+                                                    "type"
+                                                ],
+                                                "additionalProperties": false
+                                            }
+                                        ]
+                                    }
+                                },
+                                "required": [
+                                    "title",
+                                    "target",
+                                    "value"
+                                ],
+                                "additionalProperties": false
+                            }
+                        }
+                    },
+                    "required": true
+                },
+                "parameters": [
+                    {
+                        "schema": {
+                            "format": "uuid",
+                            "type": "string"
+                        },
+                        "in": "path",
+                        "name": "subscription",
+                        "required": true,
+                        "description": "The subscription identifier"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Default Response",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/SubscriptionDiscount"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/api/admin/v1/subscriptions/{subscription}/items": {
+            "post": {
+                "description": "Creates a subscription item",
+                "requestBody": {
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "type": "object",
+                                "properties": {
+                                    "quantity": {
+                                        "minimum": 1,
+                                        "type": "integer"
+                                    },
+                                    "variant": {
+                                        "minLength": 1,
+                                        "type": "string"
+                                    }
+                                },
+                                "required": [
+                                    "quantity",
+                                    "variant"
+                                ],
+                                "additionalProperties": false
+                            }
+                        }
+                    },
+                    "required": true
+                },
+                "parameters": [
+                    {
+                        "schema": {
+                            "format": "uuid",
+                            "type": "string"
+                        },
+                        "in": "path",
+                        "name": "subscription",
+                        "required": true,
+                        "description": "The subscription identifier"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Default Response",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/SubscriptionItem"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/api/admin/v1/subscriptions/{subscription}/discounts/{discount}": {
+            "patch": {
+                "description": "Updates a subscription discount",
+                "requestBody": {
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "type": "object",
+                                "properties": {
+                                    "target": {
+                                        "anyOf": [
+                                            {
+                                                "type": "object",
+                                                "properties": {
+                                                    "type": {
+                                                        "type": "string",
+                                                        "enum": [
+                                                            "Shipping"
+                                                        ]
+                                                    }
+                                                },
+                                                "required": [
+                                                    "type"
+                                                ],
+                                                "additionalProperties": false
+                                            },
+                                            {
+                                                "type": "object",
+                                                "properties": {
+                                                    "type": {
+                                                        "type": "string",
+                                                        "enum": [
+                                                            "Line"
+                                                        ]
+                                                    },
+                                                    "selector": {
+                                                        "anyOf": [
+                                                            {
+                                                                "type": "object",
+                                                                "properties": {
+                                                                    "type": {
+                                                                        "type": "string",
+                                                                        "enum": [
+                                                                            "all"
+                                                                        ]
+                                                                    }
+                                                                },
+                                                                "required": [
+                                                                    "type"
+                                                                ],
+                                                                "additionalProperties": false
+                                                            },
+                                                            {
+                                                                "type": "object",
+                                                                "properties": {
+                                                                    "type": {
+                                                                        "type": "string",
+                                                                        "enum": [
+                                                                            "some"
+                                                                        ]
+                                                                    },
+                                                                    "lines": {
+                                                                        "type": "array",
+                                                                        "items": {
+                                                                            "format": "uuid",
+                                                                            "type": "string"
+                                                                        }
+                                                                    }
+                                                                },
+                                                                "required": [
+                                                                    "type",
+                                                                    "lines"
+                                                                ],
+                                                                "additionalProperties": false
+                                                            }
+                                                        ]
+                                                    }
+                                                },
+                                                "required": [
+                                                    "type",
+                                                    "selector"
+                                                ],
+                                                "additionalProperties": false
+                                            }
+                                        ]
+                                    },
+                                    "value": {
+                                        "anyOf": [
+                                            {
+                                                "type": "object",
+                                                "properties": {
+                                                    "amount": {
+                                                        "exclusiveMinimum": 0,
+                                                        "type": "number"
+                                                    },
+                                                    "type": {
+                                                        "type": "string",
+                                                        "enum": [
+                                                            "FixedAmount"
+                                                        ]
+                                                    },
+                                                    "appliesOnEachItem": {
+                                                        "type": "boolean"
+                                                    }
+                                                },
+                                                "required": [
+                                                    "amount",
+                                                    "type",
+                                                    "appliesOnEachItem"
+                                                ],
+                                                "additionalProperties": false
+                                            },
+                                            {
+                                                "type": "object",
+                                                "properties": {
+                                                    "percentage": {
+                                                        "exclusiveMinimum": 0,
+                                                        "maximum": 100,
+                                                        "type": "number"
+                                                    },
+                                                    "type": {
+                                                        "type": "string",
+                                                        "enum": [
+                                                            "Percentage"
+                                                        ]
+                                                    }
+                                                },
+                                                "required": [
+                                                    "percentage",
+                                                    "type"
+                                                ],
+                                                "additionalProperties": false
+                                            }
+                                        ]
+                                    }
+                                },
+                                "required": [],
+                                "additionalProperties": false
+                            }
+                        }
+                    }
+                },
+                "parameters": [
+                    {
+                        "schema": {
+                            "format": "uuid",
+                            "type": "string"
+                        },
+                        "in": "path",
+                        "name": "subscription",
+                        "required": true,
+                        "description": "The subscription identifier"
+                    },
+                    {
+                        "schema": {
+                            "format": "uuid",
+                            "type": "string"
+                        },
+                        "in": "path",
+                        "name": "discount",
+                        "required": true,
+                        "description": "The subscription discount identifier"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Default Response",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/SubscriptionDiscount"
+                                }
+                            }
+                        }
+                    }
+                }
+            },
+            "delete": {
+                "description": "Deletes a subscription discount",
+                "requestBody": {
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "type": "object",
+                                "properties": {},
+                                "additionalProperties": false
+                            }
+                        }
+                    }
+                },
+                "parameters": [
+                    {
+                        "schema": {
+                            "format": "uuid",
+                            "type": "string"
+                        },
+                        "in": "path",
+                        "name": "subscription",
+                        "required": true,
+                        "description": "The subscription identifier"
+                    },
+                    {
+                        "schema": {
+                            "format": "uuid",
+                            "type": "string"
+                        },
+                        "in": "path",
+                        "name": "discount",
+                        "required": true,
+                        "description": "The subscription discount identifier"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Default Response",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "id": {
+                                            "format": "uuid",
+                                            "type": "string"
+                                        },
+                                        "deleted": {
+                                            "type": "boolean",
+                                            "enum": [
+                                                true
+                                            ]
+                                        }
+                                    },
+                                    "required": [
+                                        "id",
+                                        "deleted"
+                                    ]
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/api/admin/v1/subscriptions/{subscription}/items/{item}": {
+            "patch": {
+                "description": "Updates a subscription item",
+                "requestBody": {
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "type": "object",
+                                "properties": {
+                                    "quantity": {
+                                        "minimum": 1,
+                                        "type": "integer"
+                                    }
+                                },
+                                "required": [],
+                                "additionalProperties": false
+                            }
+                        }
+                    }
+                },
+                "parameters": [
+                    {
+                        "schema": {
+                            "format": "uuid",
+                            "type": "string"
+                        },
+                        "in": "path",
+                        "name": "subscription",
+                        "required": true,
+                        "description": "The subscription identifier"
+                    },
+                    {
+                        "schema": {
+                            "format": "uuid",
+                            "type": "string"
+                        },
+                        "in": "path",
+                        "name": "item",
+                        "required": true,
+                        "description": "The subscription item identifier"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Default Response",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/SubscriptionItem"
+                                }
+                            }
+                        }
+                    }
+                }
+            },
+            "delete": {
+                "description": "Deletes a subscription item",
+                "requestBody": {
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "type": "object",
+                                "properties": {},
+                                "additionalProperties": false
+                            }
+                        }
+                    }
+                },
+                "parameters": [
+                    {
+                        "schema": {
+                            "format": "uuid",
+                            "type": "string"
+                        },
+                        "in": "path",
+                        "name": "subscription",
+                        "required": true,
+                        "description": "The subscription identifier"
+                    },
+                    {
+                        "schema": {
+                            "format": "uuid",
+                            "type": "string"
+                        },
+                        "in": "path",
+                        "name": "item",
+                        "required": true,
+                        "description": "The subscription item identifier"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Default Response",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "id": {
+                                            "format": "uuid",
+                                            "type": "string"
+                                        },
+                                        "deleted": {
+                                            "type": "boolean",
+                                            "enum": [
+                                                true
+                                            ]
+                                        }
+                                    },
+                                    "required": [
+                                        "id",
+                                        "deleted"
+                                    ]
+                                }
+                            }
+                        }
+                    }
+                }
+            }
         }
-      }
-    },
-    "/plants/{id}": {
-      "delete": {
-        "description": "Deletes a single plant based on the ID supplied",
-        "parameters": [
-          {
-            "name": "id",
-            "in": "path",
-            "description": "ID of plant to delete",
-            "required": true,
-            "schema": {
-              "type": "integer",
-              "format": "int64"
-            }
-          }
-        ],
-        "responses": {
-          "204": {
-            "description": "Plant deleted",
-            "content": {}
-          },
-          "400": {
-            "description": "unexpected error",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/Error"
-                }
-              }
-            }
-          }
-        }
-      }
     }
-  },
-  "components": {
-    "schemas": {
-      "Plant": {
-        "required": [
-          "name"
-        ],
-        "type": "object",
-        "properties": {
-          "name": {
-            "description": "The name of the plant",
-            "type": "string"
-          },
-          "tag": {
-            "description": "Tag to specify the type",
-            "type": "string"
-          }
-        }
-      },
-      "NewPlant": {
-        "allOf": [
-          {
-            "$ref": "#/components/schemas/Plant"
-          },
-          {
-            "required": [
-              "id"
-            ],
-            "type": "object",
-            "properties": {
-              "id": {
-                "description": "Identification number of the plant",
-                "type": "integer",
-                "format": "int64"
-              }
-            }
-          }
-        ]
-      },
-      "Error": {
-        "required": [
-          "error",
-          "message"
-        ],
-        "type": "object",
-        "properties": {
-          "error": {
-            "type": "integer",
-            "format": "int32"
-          },
-          "message": {
-            "type": "string"
-          }
-        }
-      }
-    },
-    "securitySchemes": {
-      "bearerAuth": {
-        "type": "http",
-        "scheme": "bearer"
-      }
-    }
-  }
 }
